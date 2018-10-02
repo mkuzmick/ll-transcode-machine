@@ -1,0 +1,15 @@
+{
+  "ffmpegPath": "ffmpeg",
+  "inputFile": false,
+  "outputFolder": false,
+  "outputFilePath": false,
+  "crf": 23,
+  "folder": false,
+  "file": true,
+  "configOptions": [
+    "ffmpegPath",
+    "outputFolder",
+    "outputFilePath",
+    "crf"
+  ]
+}

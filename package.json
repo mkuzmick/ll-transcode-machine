@@ -1,0 +1,30 @@
+{
+  "name": "transcoding-machine",
+  "version": "1.0.0",
+  "description": "simple ffmpeg transcode wrapper",
+  "main": "index.js",
+  "bin": {
+    "transcode": "cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/learninglab-dev/transcoding-machine.git"
+  },
+  "author": "The Learning Lab Fellows",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/learninglab-dev/transcoding-machine/issues"
+  },
+  "homepage": "https://github.com/learninglab-dev/transcoding-machine#readme",
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "clear": "^0.1.0",
+    "configstore": "^4.0.0",
+    "figlet": "^1.2.0",
+    "fs-extra": "^7.0.0",
+    "yargs": "^12.0.2"
+  }
+}
