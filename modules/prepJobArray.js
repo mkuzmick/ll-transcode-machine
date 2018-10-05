@@ -1,16 +1,11 @@
-const transcoder = require("./tools/workflow_tools/transcoder");
 
-if (args.transcode) {
-  var destRoot = process.env.BASE_DIR
-  console.log(JSON.stringify(args, null, 8));
-  var crfVal = 23
-  if (args.crf) {
-    crfVal = args.crf
-  }
-  else {
-    crfVal = 23;
-  }
-  if (args.folder) {
+
+
+function createJobArray(settings){
+
+}
+
+if (args.folder) {
     var argElements = args.folder.split('/');
     console.log(argElements);
     console.log(argElements.length);
@@ -51,4 +46,5 @@ if (args.transcode) {
     console.log("didn't get expected input.  you have to add a folder with the --folder flag");
     // transcode(args.transcode, crfVal);
   }
-}
+
+module.exports.createJobArray = createJobArray;
