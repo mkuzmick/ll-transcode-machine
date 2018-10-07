@@ -14,6 +14,9 @@ var conf = new Configstore(pkg.name);
 var cp = require("child_process");
 
 exports.mergeSettings = function(yargs, defaults){
+  console.log("defaults: " + JSON.stringify(defaults));
+  console.log("conf.all: " + JSON.stringify(conf.all));
+  console.log("yargs: " + JSON.stringify(yargs));
   return ({...defaults, ...conf.all, ...yargs});
 }
 
@@ -35,6 +38,11 @@ exports.printJson = function(obj){
   console.log(JSON.stringify(obj, null, 4));
 }
 
+exports.getTarget = function(args, propName){
+  // figure out whether to use prop or first element of `_` array
+  return (args[propName]===true ? args._[0] : args[propName]);
+}
+
 exports.setConfig = function(yargs, defaults){
   for (var i = 0; i < defaults.configOptions.length; i++) {
     if (yargs[defaults.configOptions[i]]) {
@@ -54,4 +62,5 @@ exports.setConfig = function(yargs, defaults){
   };
   console.log("set your configuration to");
   console.log(JSON.stringify(conf.all, null, 4));
+  console.log("total list of options = " + defaults.configOptions);
 }

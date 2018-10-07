@@ -1,9 +1,9 @@
 global.__basedir = __dirname;
-var transcodeIt = require('./modules/transcoder').transcodeIt;
+var transcoder = require('./modules/transcoder');
 
 const transcode = async function (settings) {
   console.log("starting transcode");
-  await transcodeIt(settings);
+  await transcoder.transcode(settings);
 }
 
 module.exports.transcode = transcode;

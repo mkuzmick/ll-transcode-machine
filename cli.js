@@ -4,6 +4,8 @@ var yargs = require('yargs').argv;
 var defaults = require('./modules/defaults');
 var transcodeMachine = require('./index');
 var cliTools = require('./modules/cli-tools');
+var chalk = require('chalk');
+
 
 cliTools.printTitle('transcode\nmachine');
 
@@ -17,14 +19,19 @@ if (yargs.config) {
     yargs.folder=false;
   }
   var jobSettings = cliTools.mergeSettings(yargs, defaults);
-  console.log("Performing a job with the following settings:");
-  if (jobSettings.folder===true) {
-    jobSettings.folderPath = jobSettings._[0];
-    console.log("folder prop is true and folder name is " + jobSettings._[0]);
-  } else if (jobSettings.folder) {
-    console.log("folder prop is 'true' and folder name is " + jobSettings.folder);
-    jobSettings.folderPath = jobSettings.folder;
+  if (jobSettings.folder) {
+    console.log("folder request");
+    // var sourceFolder = jobSettings.folder===true ? jobSettings._[0] : jobSettings.folder;
+    // console.log(sourceFolder);
+    // jobSettings.folder = sourceFolder;
+    jobSettings.folder = cliTools.getTarget(jobSettings, "folder");
   }
-  transcodeMachine.transcode(jobSettings);
-    // .then(()=>console.log("done."));
+  if (jobSettings.file) {
+    console.log("file request");
+    jobSettings.file = cliTools.getTarget(jobSettings, "file");
+  }
+  // console.log("Performing a job with the following settings:");
+  // console.log(chalk.red(JSON.stringify(jobSettings, null, 4)));
+  transcodeMachine.transcode(jobSettings)
+    .then(()=>console.log("done."));
 }

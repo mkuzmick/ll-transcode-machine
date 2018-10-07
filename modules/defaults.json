@@ -1,16 +1,24 @@
 {
   "ffmpegPath": "ffmpeg",
-  "outputFolder": false,
-  "outputFilePath": false,
+  "ffprobePath": "ffprobe",
   "crf": 23,
   "folder": false,
   "file": true,
+  "max1080": false,
+  "overwrite": true,
+  "codec": "H.264",
+  "slack": false,
+  "slackName": false,
   "configOptions": [
     "ffmpegPath",
-    "outputFolder",
-    "outputFilePath",
+    "ffprobePath",
     "crf",
     "file",
-    "folder"
+    "folder",
+    "max1080",
+    "overwrite",
+    "codec",
+    "slack",
+    "slackName"
   ]
 }

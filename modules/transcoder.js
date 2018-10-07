@@ -2,104 +2,78 @@ const fs = require("fs");
 const path = require("path");
 const cp = require('child_process');
 const chalk = require("chalk");
-const videoRegEx = /\.(mov|mp4|m4v)$/i
+const videoRegEx = /\.(mov|mp4|m4v|mts)$/i;
+const buildJobArray = require('./build-job-array');
+const transcodeFile = require('./transcode-file');
+const folderSuffix = require('./folder-suffix');
+const slackIt = require('./slack-it');
+require('dotenv').config();
 
-function transcodeIt (settings) {
+function transcode (settings) {
   console.log(chalk.blue(JSON.stringify(settings, null, 4)));
   if (settings.file) {
-    console.log("going to transcode a file");
-    transcodeFile(file, settings);
-  } else if (settings.folder) {
-    console.log("going to transcode a folder");
-    var theFiles=fs.readdirSync(settings.folderPath);
-    for (var i = 0; i < theFiles.length; i++) {
-      if(videoRegEx.test(theFiles[i])){
-        var thisPath = path.join(settings.folderPath, theFiles[i]);
-        console.log(thisPath + " is a video file");
-        var theseSettings = {
-          ffmpegPath:settings.ffmpegPath,
-          sourcePath:thisPath,
-          destinationPath:(path.join(settings.outputFolder, theFiles[i])),
-          outputWidth:1920,
-          outputHeight:1080,
-          crfVal: 23,
+    try {
+      var stats = fs.statSync(settings.file);
+      if (stats.isFile()) {
+        // create outputDirectory, like
+        // /path/to/shootfolder_h264_23_1080
+        settings.inputPath = settings.file;
+        var outputDirectory = path.join(
+          settings.outputFolder,
+          (path.basename(settings.file, path.extname(settings.file))
+            + folderSuffix(settings))
+        );
+        if (!fs.existsSync(outputDirectory)){
+          fs.mkdirSync(outputDirectory);
         }
-        // sourcePath, destinationPath, crfVal,
-          // outputWidth, outputHeight
-        transcodeFile(thisPath, theseSettings);
+        settings.outputPath = path.join(
+            outputDirectory,
+            (path.basename(settings.file))
+        );
+        transcodeFile(settings);
+        if (settings.slack==true) {
+          console.log("going to try to slackIt");
+          slackIt(settings)
+        }
+      } else {
+        console.log("this doesn't seem to really be a file:" + settings.file);
       }
     }
+    catch(err) {
+        console.log("job failed");
+        console.log(err);
+    }
+  } else if (settings.folder) {
+    settings.inputFolder = settings.folder
+    try {
+      var stats = fs.statSync(settings.inputFolder);
+      if (stats.isDirectory()) {
+        settings.targetFolder = path.join(
+          settings.outputFolder,
+          (path.basename(settings.inputFolder) + folderSuffix(settings))
+        )
+        if (!fs.existsSync(settings.targetFolder)){
+            fs.mkdirSync(settings.targetFolder);
+        }
+        var jobArray = buildJobArray(settings);
+        for (var i = 0; i < jobArray.length; i++) {
+          transcodeFile(jobArray[i]);
+          if (jobArray[i].slack==true) {
+            slackIt(jobArray[i]);
+          }
+        }
+      } else {
+        console.log("doesn't look like this is really a folder:" + settings.inputFolder);
+      }
+    }
+    catch(err) {
+        console.log('problem transcoding folder');
+        console.log(err);
+    }
+
   } else {
     console.log("not sure whether you want to transcode a file or folder or anything--set this in the commands or in defaults?");
   }
 }
 
-function transcodeFile(file, settings){
-    console.log("about to transcode ");
-    console.log(JSON.stringify(settings, null, 4));
-    var theJson = getFfprobeJson(file, settings.ffmpegPath);
-    var dimensions = getDesiredDimensions(theJson);
-    var output = cp.spawnSync(settings.ffmpegPath, [
-      '-i', settings.sourcePath,
-      '-c:v', 'libx264',
-      '-pix_fmt', 'yuv420p',
-      '-vf', ('scale='+ dimensions.outputWidth +':'+dimensions.outputHeight ),
-      '-vf', ('scale=1920:1080' ),
-      '-preset', 'slow',
-      '-crf', settings.crfVal,
-      '-c:a', 'aac', '-b:a', '128k',
-      '-map_channel', '0.2.0',
-      '-map_channel', '0.2.1',
-      settings.destinationPath]
-      , {
-        stdio: [
-          0, // Use parent's stdin for child
-          'pipe', // Pipe child's stdout to parent
-          2 // Direct child's stderr to a file
-        ]
-      }
-    );
-}
-
-
-function slackIt(settings){
-  var thePayload = 'payload={"channel": "#ll-workflow-alerts", "username": "theworkflow-bot", "text": "<@marlon>: just transcoded ' + path.basename(sourcePath) + ' and put it here: ' + destinationPath + ' .", "icon_emoji": ":desktop_computer:"}';
-  cp.spawnSync("curl", ['-X', 'POST', '--data-urlencode', thePayload, process.env.SLACK_WEBHOOK_URL]);
-  console.log("\n\n");
-}
-
-function getFfprobeJson(filePath){
-  console.log("about to grab json for " + JSON.stringify(filePath));
-  var options = ['-v', 'quiet', '-print_format', 'json', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', filePath];
-  var ffProbeOutput = cp.spawnSync('ffprobe', options, { encoding : 'utf8' });
-  var theJson = JSON.parse(ffProbeOutput.stdout);
-  console.log(chalk.blue(JSON.stringify(theJson, null, 4)));
-  return theJson;
-}
-
-function getDesiredDimensions(ffprobeJson, videoFilePath){
-  var outputWidth=1920;
-  var outputHeight=1080;
-  console.log(ffprobeJson.streams[0].width + " is the width");
-  if (ffprobeJson.streams[0].height && (ffprobeJson.streams[0].height>1080)) {
-    console.log(videoFilePath + " has height larger than 1080: " + ffprobeJson.streams[0].height);
-    outputWidth=ffprobeJson.streams[0].width/(ffprobeJson.streams[0].height/1080);
-    console.log("making outputWidth " + outputWidth);
-  }
-  else if (ffprobeJson.streams[0].height && (ffprobeJson.streams[0].height==1080)) {
-    console.log(videoFilePath + " has height of exactly 1080: " + ffprobeJson.streams[0].height);
-  }
-  else if (ffprobeJson.streams[0].height && (ffprobeJson.streams[0].height<1080)) {
-    console.log(videoFilePath + " has height of less than 1080: " + ffprobeJson.streams[0].height);
-    outputWidth=ffprobeJson.streams[0].width;
-    outputHeight=ffprobeJson.streams[0].height;
-  }
-  else {
-    console.log("something went wrong--perhaps this is not a video file");
-  }
-  return {outputWidth: outputWidth, outputHeight: outputHeight};
-}
-
-
-
-module.exports.transcodeIt = transcodeIt;
+module.exports.transcode = transcode;
