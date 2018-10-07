@@ -1,5 +1,5 @@
 {
-  "name": "ll-transcoder",
+  "name": "ll-transcode-machine",
   "version": "1.0.0",
   "description": "simple ffmpeg transcode wrapper",
   "main": "index.js",
