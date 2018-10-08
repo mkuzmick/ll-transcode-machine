@@ -5,9 +5,10 @@ var defaults = require('./modules/defaults');
 var transcodeMachine = require('./index');
 var cliTools = require('./modules/cli-tools');
 var chalk = require('chalk');
+var path = require('path');
 
 
-cliTools.printTitle('transcode\nmachine');
+cliTools.printTitle(['transcode\nmachine']);
 
 if (yargs.config) {
   cliTools.setConfig(yargs, defaults);
@@ -25,13 +26,21 @@ if (yargs.config) {
     // console.log(sourceFolder);
     // jobSettings.folder = sourceFolder;
     jobSettings.folder = cliTools.getTarget(jobSettings, "folder");
+    if (!jobSettings.outputFolder) {
+      jobSettings.outputFolder=path.dirname(jobSettings.folder);
+    }
   }
   if (jobSettings.file) {
     console.log("file request");
     jobSettings.file = cliTools.getTarget(jobSettings, "file");
+    if (!jobSettings.outputFolder) {
+      jobSettings.outputFolder=path.dirname(jobSettings.file  );
+    }
   }
   // console.log("Performing a job with the following settings:");
   // console.log(chalk.red(JSON.stringify(jobSettings, null, 4)));
+
+
   transcodeMachine.transcode(jobSettings)
     .then(()=>console.log("done."));
 }

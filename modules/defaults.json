@@ -9,6 +9,7 @@
   "codec": "H.264",
   "slack": false,
   "slackName": false,
+  "outputFolder": false,
   "configOptions": [
     "ffmpegPath",
     "ffprobePath",
@@ -19,6 +20,7 @@
     "overwrite",
     "codec",
     "slack",
-    "slackName"
+    "slackName",
+    "outputFolder"
   ]
 }

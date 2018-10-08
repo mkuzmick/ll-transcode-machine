@@ -24,7 +24,7 @@ exports.printTitle = function(title){
   clear();
   console.log('\n' +
     chalk.bold.magenta(
-      figlet.textSync(title, { horizontalLayout: 'full'})
+      figlet.textSync(title, { horizontalLayout: 'full', verticalLayout: 'fitted'})
     ) + '\n\n'
   );
 }

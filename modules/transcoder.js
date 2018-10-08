@@ -7,7 +7,7 @@ const buildJobArray = require('./build-job-array');
 const transcodeFile = require('./transcode-file');
 const folderSuffix = require('./folder-suffix');
 const slackIt = require('./slack-it');
-require('dotenv').config();
+// require('dotenv').config();
 
 function transcode (settings) {
   console.log(chalk.blue(JSON.stringify(settings, null, 4)));
