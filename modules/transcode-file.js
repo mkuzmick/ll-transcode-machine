@@ -7,7 +7,7 @@ const hyperRegex = /(hyper|_SS_|_Pgm1_|_Pgm2_|_Pgm3_|Capture0)/i;
 function transcodeFile(settings){
     console.log("\n\n________________\nabout to transcode " + settings.inputPath);
     console.log("and put it here: " + settings.outputPath);
-    console.log("with these settigns:");
+    console.log("with these settings:");
     console.log(JSON.stringify(settings, null, 4));
     var options = buildOptions(settings);
     var output = cp.spawnSync(settings.ffmpegPath, options, {

@@ -14,9 +14,9 @@ var conf = new Configstore(pkg.name);
 var cp = require("child_process");
 
 exports.mergeSettings = function(yargs, defaults){
-  console.log("defaults: " + JSON.stringify(defaults));
-  console.log("conf.all: " + JSON.stringify(conf.all));
-  console.log("yargs: " + JSON.stringify(yargs));
+  console.log("package defaults: " + JSON.stringify(defaults));
+  console.log("your config: " + JSON.stringify(conf.all));
+  console.log("new args: " + JSON.stringify(yargs));
   return ({...defaults, ...conf.all, ...yargs});
 }
 
@@ -42,6 +42,9 @@ exports.getTarget = function(args, propName){
   // figure out whether to use prop or first element of `_` array
   return (args[propName]===true ? args._[0] : args[propName]);
 }
+
+// TODO: a lame thing left over here.  Let's just loop through all
+// the properties in defaults and not bother adding that defaults.configOptions array.
 
 exports.setConfig = function(yargs, defaults){
   for (var i = 0; i < defaults.configOptions.length; i++) {
