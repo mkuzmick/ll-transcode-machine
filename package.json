@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mkuzmick/ll-transcoding-machine.git"
+    "url": "git+https://github.com/mkuzmick/ll-transcode-machine.git"
   },
   "author": "Marlon Kuzmick",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mkuzmick/ll-transcoding-machine/issues"
+    "url": "https://github.com/mkuzmick/ll-transcode-machine/issues"
   },
-  "homepage": "https://github.com/mkuzmick/ll-transcoding-machine#readme",
+  "homepage": "https://github.com/mkuzmick/ll-transcode-machine#readme",
   "dependencies": {
     "chalk": "^2.4.1",
     "clear": "^0.1.0",
